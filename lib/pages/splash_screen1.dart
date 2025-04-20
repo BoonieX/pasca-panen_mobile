@@ -1,0 +1,51 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'splash_screen.dart'; // Ganti sesuai nama file login kamu
+
+class SplashScreen1 extends StatefulWidget {
+  const SplashScreen1({super.key});
+
+  @override
+  State<SplashScreen1> createState() => _SplashScreen1State();
+}
+class _SplashScreen1State extends State<SplashScreen1> {
+  double _opacity = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Trigger fade-in
+    Future.delayed(const Duration(milliseconds: 300), () {
+      setState(() {
+        _opacity = 1.0;
+      });
+    });
+
+    // Pindah ke login setelah 3 detik
+    Timer(const Duration(seconds: 3), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SplashScreen()),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 250, 248, 248),
+      body: Center(
+        child: AnimatedOpacity(
+          opacity: _opacity,
+          duration: const Duration(seconds: 2),
+          child: Image.asset(
+            'assets/logo_splash.png',
+            width: 200,
+            height: 200,
+          ),
+        ),
+      ),
+    );
+  }
+}

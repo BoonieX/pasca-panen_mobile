@@ -68,6 +68,11 @@ flutter:
   assets:
     - assets/logoapk.png
     - assets/logogoogle.webp
+    - assets/logo_splash.png
+    - assets/logo_splash1.jpg
+    - assets/logo_splash2.jpg
+    - assets/logo_splash3.jpg
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:

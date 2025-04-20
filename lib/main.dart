@@ -3,6 +3,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pascapanen_mobile/database/db_helper.dart';
 import 'package:pascapanen_mobile/model/user_model.dart';
 import 'package:pascapanen_mobile/register/register_page.dart';
+import 'pages/splash_screen.dart';
+import 'pages/splash_screen1.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +26,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
-      home: const RegisterPage(),
+            home: const SplashScreen1(),
+
     );
   }
 }
