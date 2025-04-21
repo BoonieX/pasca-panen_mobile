@@ -15,7 +15,7 @@ class _SplashScreenState extends State<SplashScreen> {
   final List<Map<String, String>> onboardingData = [
   
     {
-      "image": "assets/logo_splash1.jpg",
+      "image": "assets/logo_splash1.png",
       "title": "Transaksi Gak Ribet !",
       "desc": "Transaksi panen jadi lebih mudah dan cepat",
     },
