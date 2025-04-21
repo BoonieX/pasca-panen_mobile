@@ -11,9 +11,9 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
+  double _opacity = 0.0;
 
   final List<Map<String, String>> onboardingData = [
-  
     {
       "image": "assets/logo_splash1.png",
       "title": "Transaksi Gak Ribet !",
@@ -32,6 +32,19 @@ class _SplashScreenState extends State<SplashScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _triggerFadeIn();
+  }
+
+  void _triggerFadeIn() {
+    setState(() => _opacity = 0.0);
+    Future.delayed(const Duration(milliseconds: 100), () {
+      setState(() => _opacity = 1.0);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -42,38 +55,45 @@ class _SplashScreenState extends State<SplashScreen> {
               controller: _controller,
               itemCount: onboardingData.length,
               onPageChanged: (index) {
-                setState(() => _currentPage = index);
+                setState(() {
+                  _currentPage = index;
+                  _triggerFadeIn(); // setiap ganti page, fade in ulang
+                });
               },
               itemBuilder: (_, index) {
                 final item = onboardingData[index];
-                return Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        item["image"]!,
-                        height: 300,
-                      ),
-                      const SizedBox(height: 24),
-                      if (item["title"]!.isNotEmpty)
-                        Text(
-                          item["title"]!,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
+                return AnimatedOpacity(
+                  opacity: _opacity,
+                  duration: const Duration(milliseconds: 800),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          item["image"]!,
+                          height: 300,
+                        ),
+                        const SizedBox(height: 24),
+                        if (item["title"]!.isNotEmpty)
+                          Text(
+                            item["title"]!,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      const SizedBox(height: 12),
-                      if (item["desc"]!.isNotEmpty)
-                        Text(
-                          item["desc"]!,
-                          style: const TextStyle(fontSize: 16),
-                          textAlign: TextAlign.center,
-                        ),
-                    ],
+                        const SizedBox(height: 12),
+                        if (item["desc"]!.isNotEmpty)
+                          Text(
+                            item["desc"]!,
+                            style: const TextStyle(fontSize: 16),
+                            textAlign: TextAlign.center,
+                          ),
+                      ],
+                    ),
                   ),
                 );
               },

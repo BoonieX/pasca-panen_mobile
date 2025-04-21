@@ -1,8 +1,9 @@
 import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
-import 'package:pascapanen_mobile/model/user_model.dart'; // Model UserModel kamu
+import 'package:pascapanen_mobile/model/user_model.dart';
 import 'register_page.dart';
 import 'package:pascapanen_mobile/pages/home_screen.dart';
+import 'forgot_password.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -109,7 +110,11 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     TextButton(
                       onPressed: () {
-                        // Lupa password?
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ForgotPasswordPage()),
+                        );
                       },
                       child: const Text(
                         "Lupa Password ?",
@@ -118,6 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 16),
 
                 SizedBox(
@@ -217,7 +223,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  /// Fungsi login dengan Hive
   Future<bool> _login(String username, String password) async {
     var box = await Hive.openBox<UserModel>('users');
 

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'splash_screen.dart'; // Ganti sesuai nama file login kamu
+import 'splash_screen.dart'; // Ganti sesuai nama file splash berikutnya
 
 class SplashScreen1 extends StatefulWidget {
   const SplashScreen1({super.key});
@@ -8,6 +8,7 @@ class SplashScreen1 extends StatefulWidget {
   @override
   State<SplashScreen1> createState() => _SplashScreen1State();
 }
+
 class _SplashScreen1State extends State<SplashScreen1> {
   double _opacity = 0.0;
 
@@ -15,15 +16,22 @@ class _SplashScreen1State extends State<SplashScreen1> {
   void initState() {
     super.initState();
 
-    // Trigger fade-in
+    // Fade in
     Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {
         _opacity = 1.0;
       });
     });
 
-    // Pindah ke login setelah 3 detik
-    Timer(const Duration(seconds: 3), () {
+    // Fade out setelah 2 detik
+    Future.delayed(const Duration(seconds: 1), () {
+      setState(() {
+        _opacity = 0.0;
+      });
+    });
+
+    // Pindah ke splash berikutnya setelah 3 detik
+    Timer(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const SplashScreen()),
@@ -38,7 +46,7 @@ class _SplashScreen1State extends State<SplashScreen1> {
       body: Center(
         child: AnimatedOpacity(
           opacity: _opacity,
-          duration: const Duration(seconds: 2),
+          duration: const Duration(seconds: 1),
           child: Image.asset(
             'assets/logo_splash.png',
             width: 200,
