@@ -1,8 +1,7 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:pascapanen_mobile/database/db_helper.dart';
+import 'package:pascapanen_mobile/model/register_request.dart';
+import 'package:pascapanen_mobile/services/api_service.dart';
 import 'package:pascapanen_mobile/model/user_model.dart';
+import 'package:flutter/material.dart';
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -28,45 +27,27 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
-      final db = DbHelper.instance;
-
-      final namaLengkap = _namaController.text.trim();
-      final username = _usernameController.text.trim();
-      final email = _emailController.text.trim();
-      final noTelp = _teleponController.text.trim();
-      final alamat = _alamatController.text.trim();
-      final password = _passwordController.text.trim();
-
-      final user = UserModel(
-        namaLengkap: namaLengkap,
-        username: username,
-        email: email,
-        noTelp: noTelp,
-        alamat: alamat,
+      final registerRequest = RegisterRequest(
+        namaLengkap: _namaController.text.trim(),
+        username: _usernameController.text.trim(),
+        email: _emailController.text.trim(),
+        noTelp: _teleponController.text.trim(),
+        alamat: _alamatController.text.trim(),
         gender: _selectedGender!,
-        password: password,
+        password: _passwordController.text.trim(),
       );
 
       try {
-        final response = await http.post(
-          Uri.parse("http://192.168.1.6:8000/api/register"), // GANTI URL
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode(user.toJson()),
-        );
+        final isSuccess = await AuthService().register(registerRequest); // sesuai service kamu
 
-        if (response.statusCode == 200) {
-          final responseData = jsonDecode(response.body);
-          final registeredUser = UserModel.fromJson(responseData['petani']);
-
-          // Simpan ke database lokal
-          await db.insertPetani(registeredUser);
-
+        if (isSuccess) {
           _showMessage("Registrasi berhasil! Silakan login.");
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (_) => const LoginPage()));
+            context,
+            MaterialPageRoute(builder: (_) => const LoginPage()),
+          );
         } else {
-          final error = jsonDecode(response.body);
-          _showMessage(error['message'] ?? "Registrasi gagal");
+          _showMessage("Registrasi gagal! Coba lagi.");
         }
       } catch (e) {
         _showMessage("Terjadi kesalahan koneksi.");
@@ -75,8 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -95,9 +75,10 @@ class _RegisterPageState extends State<RegisterPage> {
                 const Text(
                   "Daftar",
                   style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
@@ -105,17 +86,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   style: TextStyle(fontSize: 14, color: Colors.black54),
                 ),
                 const SizedBox(height: 30),
-
                 _buildTextField(
-                    icon: Icons.person,
-                    hint: "Nama Lengkap",
-                    controller: _namaController),
+                  icon: Icons.person,
+                  hint: "Nama Lengkap",
+                  controller: _namaController,
+                ),
                 _buildTextField(
-                    icon: Icons.account_circle,
-                    hint: "Username",
-                    controller: _usernameController),
-
-                // Gender Dropdown
+                  icon: Icons.account_circle,
+                  hint: "Username",
+                  controller: _usernameController,
+                ),
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
@@ -130,49 +110,58 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     hint: const Text("Pilih Gender"),
                     value: _selectedGender,
-                    validator: (value) =>
-                        value == null ? "Pilih gender!" : null,
-                    items: ["Laki-laki", "Perempuan"]
-                        .map((gender) =>
-                            DropdownMenuItem(value: gender, child: Text(gender)))
-                        .toList(),
-                    onChanged: (value) => setState(() {
-                      _selectedGender = value;
-                    }),
+                    validator:
+                        (value) => value == null ? "Pilih gender!" : null,
+                    items:
+                        ["Laki-laki", "Perempuan"]
+                            .map(
+                              (gender) => DropdownMenuItem(
+                                value: gender,
+                                child: Text(gender),
+                              ),
+                            )
+                            .toList(),
+                    onChanged:
+                        (value) => setState(() {
+                          _selectedGender = value;
+                        }),
                   ),
                 ),
-
                 _buildTextField(
-                    icon: Icons.email,
-                    hint: "Email",
-                    controller: _emailController,
-                    type: TextInputType.emailAddress),
+                  icon: Icons.email,
+                  hint: "Email",
+                  controller: _emailController,
+                  type: TextInputType.emailAddress,
+                ),
                 _buildTextField(
-                    icon: Icons.phone,
-                    hint: "No Telepon",
-                    controller: _teleponController,
-                    type: TextInputType.phone),
+                  icon: Icons.phone,
+                  hint: "No Telepon",
+                  controller: _teleponController,
+                  type: TextInputType.phone,
+                ),
                 _buildTextField(
-                    icon: Icons.location_on,
-                    hint: "Alamat",
-                    controller: _alamatController),
-
+                  icon: Icons.location_on,
+                  hint: "Alamat",
+                  controller: _alamatController,
+                ),
                 _buildPasswordField(
                   hint: "Password",
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  toggle: () =>
-                      setState(() => _obscurePassword = !_obscurePassword),
+                  toggle:
+                      () => setState(() => _obscurePassword = !_obscurePassword),
                 ),
                 _buildPasswordField(
                   hint: "Konfirmasi Password",
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
-                  toggle: () => setState(
-                      () => _obscureConfirmPassword = !_obscureConfirmPassword),
+                  toggle:
+                      () => setState(
+                        () =>
+                            _obscureConfirmPassword = !_obscureConfirmPassword,
+                      ),
                   isConfirmation: true,
                 ),
-
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
@@ -185,8 +174,10 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: const Text("DAFTAR",
-                        style: TextStyle(color: Colors.white)),
+                    child: const Text(
+                      "DAFTAR",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -195,12 +186,20 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     const Text("Sudah Punya Akun? "),
                     GestureDetector(
-                      onTap: () => Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (_) => const LoginPage())),
-                      child: const Text("Masuk",
-                          style: TextStyle(
-                              color: Colors.deepPurple,
-                              fontWeight: FontWeight.bold)),
+                      onTap:
+                          () => Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const LoginPage(),
+                            ),
+                          ),
+                      child: const Text(
+                        "Masuk",
+                        style: TextStyle(
+                          color: Colors.deepPurple,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -223,16 +222,20 @@ class _RegisterPageState extends State<RegisterPage> {
       child: TextFormField(
         controller: controller,
         keyboardType: type,
-        validator: (value) =>
-            value == null || value.isEmpty ? "$hint tidak boleh kosong" : null,
+        validator:
+            (value) =>
+                value == null || value.isEmpty
+                    ? "$hint tidak boleh kosong"
+                    : null,
         decoration: InputDecoration(
           prefixIcon: Icon(icon),
           hintText: hint,
           filled: true,
           fillColor: Colors.green[100],
           border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: BorderSide.none),
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
+          ),
         ),
       ),
     );
@@ -263,12 +266,11 @@ class _RegisterPageState extends State<RegisterPage> {
           filled: true,
           fillColor: Colors.green[100],
           border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: BorderSide.none),
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
+          ),
           suffixIcon: IconButton(
-            icon: Icon(
-              obscureText ? Icons.visibility_off : Icons.visibility,
-            ),
+            icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
             onPressed: toggle,
           ),
         ),

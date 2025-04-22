@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../register/register_page.dart';
+import '../screens/register_page.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
