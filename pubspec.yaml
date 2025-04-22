@@ -34,17 +34,17 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  sqflite: ^2.3.0
-  path: any
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
   path_provider: ^2.0.15
   collection: ^1.17.1
+  http: ^1.3.0
+  sqflite: ^2.3.0
+  idb_sqflite: ^1.3.4
+  path: ^1.8.3
+  sqflite_common_ffi: ^2.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  hive_generator: ^2.0.0
   build_runner: ^2.4.6
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -68,6 +68,11 @@ flutter:
   assets:
     - assets/logoapk.png
     - assets/logogoogle.webp
+    - assets/logo_splash.png
+    - assets/logo_splash1.jpg
+    - assets/logo_splash2.jpg
+    - assets/logo_splash3.jpg
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:

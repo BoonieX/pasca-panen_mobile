@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:pascapanen_mobile/widgets/bottom_nav_bar.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final String userName;
+
+  const HomeScreen({super.key, required this.userName});
+  
 
   @override
   Widget build(BuildContext context) {
@@ -10,10 +13,10 @@ class HomeScreen extends StatelessWidget {
     Color darkGreen = const Color(0xFF2E7D32);
     Color softGreen = const Color(0xFFF0F8F2);
 
-    return Scaffold(
+        return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Halo, Pak"),
+        title: Text("Halo, $userName"),
         backgroundColor: primaryGreen,
         actions: const [
           Padding(

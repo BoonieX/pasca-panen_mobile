@@ -1,32 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:pascapanen_mobile/database/db_helper.dart';
-import 'package:pascapanen_mobile/model/user_model.dart';
-import 'package:pascapanen_mobile/register/login_page.dart'; // ganti sesuai path-mu 'package_page.dart';
+import 'package:flutter/foundation.dart'; // untuk kIsWeb
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
+
+import 'database_initializer_stub.dart'
+    if (dart.library.io) 'database_initializer_io.dart';
+
+import 'pages/splash_screen1.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  print("1. WidgetsFlutterBinding initialized");
 
-  await Hive.initFlutter();
-  print("2. Hive initialized");
+  await initializeDatabase();
 
-  if (!Hive.isAdapterRegistered(UserModelAdapter().typeId)) {
-    Hive.registerAdapter(UserModelAdapter());
-    print("3. UserModelAdapter registered");
+  if (!kIsWeb) {
+    final databasePath = await getDatabasesPath();
+    final String path = join(databasePath, 'pascapanen.db');
+
+    final Database db = await openDatabase(
+      path,
+      version: 1,
+      onCreate: (Database db, int version) async {
+        await db.execute('''CREATE TABLE users(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          nama TEXT,
+          username TEXT,
+          email TEXT,
+          telepon TEXT,
+          alamat TEXT,
+          gender TEXT,
+          password TEXT
+        )''');
+      },
+    );
   } else {
-    print("3. Adapter already registered");
+    print("Running on Web: SQLite not supported, skipping DB init");
   }
 
-  await Hive.openBox<UserModel>('users');
-  print("4. Box 'users' opened");
-
   runApp(const MyApp());
-  print("5. App started");
 }
-
-
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -38,7 +50,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
-      home: const LoginPage(),
+      home: const SplashScreen1(),
     );
   }
 }
