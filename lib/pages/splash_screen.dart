@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/register_page.dart';
+import '../screens/login_page.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -159,7 +159,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void _goToRegister(BuildContext context) {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const RegisterPage()),
+      MaterialPageRoute(builder: (context) => const LoginPage()),
     );
   }
 }

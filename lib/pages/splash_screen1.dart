@@ -24,14 +24,14 @@ class _SplashScreen1State extends State<SplashScreen1> {
     });
 
     // Fade out setelah 2 detik
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 2), () {
       setState(() {
         _opacity = 0.0;
       });
     });
 
     // Pindah ke splash berikutnya setelah 3 detik
-    Timer(const Duration(seconds: 2), () {
+    Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const SplashScreen()),

@@ -1,6 +1,5 @@
 import 'package:pascapanen_mobile/model/register_request.dart';
 import 'package:pascapanen_mobile/services/api_service.dart';
-import 'package:pascapanen_mobile/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 

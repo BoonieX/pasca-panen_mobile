@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../model/register_request.dart';
 import '../model/login_request.dart';
 import '../model/user_model.dart';
@@ -118,7 +117,6 @@ class AuthService {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
-    print("Logout berhasil.");
   }
 
   // ✅ CEK APAKAH LOGIN
