@@ -6,7 +6,7 @@ import '../model/login_request.dart';
 import '../model/user_model.dart';
 
 class AuthService {
-  static const String baseUrl = "http://192.168.1.6:8000/api";
+  static const String baseUrl = "http://192.168.43.182:8000/api";
 
   // ✅ REGISTER
   Future<bool> register(RegisterRequest request) async {
@@ -56,10 +56,11 @@ class AuthService {
         if (token != null && token is String) {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', token);
-          print("Login berhasil! Token disimpan.");
+          await prefs.setString('last_login', DateTime.now().toIso8601String()); // ✅ Simpan waktu login
+          print("Login berhasil! Token & waktu login disimpan.");
 
           if (userData != null && userData is Map<String, dynamic>) {
-            return UserModel.fromJson(userData, token: token); // 🛠️ Tambahkan token ke user
+            return UserModel.fromJson(userData, token: token);
           } else {
             print("Data user tidak ditemukan atau invalid.");
           }
@@ -98,7 +99,7 @@ class AuthService {
           final user = data['user'];
 
           if (user != null && user is Map<String, dynamic>) {
-            return UserModel.fromJson(user, token: token); // 🛠️ Tambahkan token
+            return UserModel.fromJson(user, token: token);
           } else {
             print("User tidak ditemukan dalam response.");
           }
@@ -117,14 +118,35 @@ class AuthService {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
+    await prefs.remove('last_login'); // ✅ Hapus waktu login juga
   }
 
-  // ✅ CEK APAKAH LOGIN
-  Future<bool> isLoggedIn() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    return token != null && token.isNotEmpty;
+// ✅ CEK APAKAH LOGIN MASIH BERLAKU (maksimal 1 hari)
+Future<bool> isLoggedIn() async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+  final lastLoginStr = prefs.getString('last_login');
+
+  if (token != null && token.isNotEmpty && lastLoginStr != null) {
+    final lastLogin = DateTime.tryParse(lastLoginStr);
+    if (lastLogin != null) {
+      final now = DateTime.now();
+      final difference = now.difference(lastLogin);
+
+      // Jika sudah lebih dari 5 hari
+      if (difference.inDays <= 1) {
+        return true; // Token masih aktif dan belum lebih dari 5 hari
+      } else {
+        print("Token kadaluwarsa, auto logout setelah 1 hari.");
+        await logout(); // Token expired setelah 1 hari
+        return false;
+      }
+    }
   }
+
+  return false;
+}
+
 
   // ✅ GET TOKEN
   Future<String?> getToken() async {

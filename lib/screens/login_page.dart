@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:pascapanen_mobile/pages/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pascapanen_mobile/pages/main_screen.dart';
+import 'package:pascapanen_mobile/screens/forgot_password.dart';
 import 'package:pascapanen_mobile/screens/register_page.dart';
 import 'package:pascapanen_mobile/services/api_service.dart';
 import 'package:pascapanen_mobile/model/login_request.dart';
+import 'package:pascapanen_mobile/model/user_model.dart';
+import 'package:pascapanen_mobile/database/db_helper.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,45 +17,86 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _identifierController = TextEditingController(); // username atau email
+  final _identifierController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _rememberMe = false;
 
-  Future<void> _login() async {
-  if (_formKey.currentState!.validate()) {
-    final login = _identifierController.text.trim(); // username atau email
-    final password = _passwordController.text.trim();
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
 
-    final loginRequest = LoginRequest(
-      identifier: login, // mengisi identifier dengan username/email
-      password: password,
-    );
+  Future<void> _checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final lastLoginStr = prefs.getString('last_login');
 
-    try {
-      final user = await AuthService().login(loginRequest); // kirim objek loginRequest
-      if (user != null) {
-        _showMessage("Login berhasil!");
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => HomeScreen(userName: user.username),
-          ),
-        );
-      } else {
-        _showMessage("Login gagal.");
+    if (token != null && lastLoginStr != null) {
+      final lastLogin = DateTime.tryParse(lastLoginStr);
+      if (lastLogin != null) {
+        final now = DateTime.now();
+        final difference = now.difference(lastLogin);
+
+        if (difference.inDays <= 1) {
+          // Langsung redirect ke MainScreen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => MainScreen()),
+          );
+        } else {
+          // Token expired, hapus data
+          await prefs.remove('token');
+          await prefs.remove('last_login');
+        }
       }
-    } catch (e) {
-      _showMessage("Terjadi kesalahan: ${e.toString()}");
     }
   }
-}
 
+  Future<void> _login() async {
+    if (_formKey.currentState!.validate()) {
+      final login = _identifierController.text.trim();
+      final password = _passwordController.text.trim();
 
+      final loginRequest = LoginRequest(identifier: login, password: password);
+
+      try {
+        final user = await AuthService().login(loginRequest);
+        if (user != null) {
+          final dbHelper = DbHelper();
+          final userModel = UserModel(
+            id: user.id,
+            namaLengkap: user.namaLengkap,
+            username: user.username,
+            gender: user.gender,
+            email: user.email,
+            noTelp: user.noTelp,
+            alamat: user.alamat,
+            token: user.token,
+          );
+          await dbHelper.insertUser(userModel);
+
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', user.token ?? '');
+          await prefs.setString('last_login', DateTime.now().toIso8601String());
+
+          _showMessage("Login berhasil!");
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => MainScreen()),
+          );
+        } else {
+          _showMessage("Login gagal. Cek username atau password.");
+        }
+      } catch (e) {
+        _showMessage("Terjadi kesalahan: ${e.toString()}");
+      }
+    }
+  }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -97,11 +142,36 @@ class _LoginPageState extends State<LoginPage> {
                   hint: "Password",
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  toggle:
-                      () =>
-                          setState(() => _obscurePassword = !_obscurePassword),
+                  toggle: () => setState(() => _obscurePassword = !_obscurePassword),
                 ),
-                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: _rememberMe,
+                          onChanged: (value) => setState(() => _rememberMe = value!),
+                          activeColor: Colors.green,
+                        ),
+                        const Text("Ingat Saya"),
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const ForgotPasswordPage()),
+                        );
+                      },
+                      child: const Text(
+                        "Lupa Password?",
+                        style: TextStyle(color: Colors.deepPurple),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -125,13 +195,10 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     const Text("Belum Punya Akun? "),
                     GestureDetector(
-                      onTap:
-                          () => Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const RegisterPage(),
-                            ),
-                          ),
+                      onTap: () => Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const RegisterPage()),
+                      ),
                       child: const Text(
                         "Daftar",
                         style: TextStyle(
@@ -161,11 +228,8 @@ class _LoginPageState extends State<LoginPage> {
       child: TextFormField(
         controller: controller,
         keyboardType: type,
-        validator:
-            (value) =>
-                value == null || value.isEmpty
-                    ? "$hint tidak boleh kosong"
-                    : null,
+        validator: (value) =>
+            value == null || value.isEmpty ? "$hint tidak boleh kosong" : null,
         decoration: InputDecoration(
           prefixIcon: Icon(icon),
           hintText: hint,
@@ -191,11 +255,8 @@ class _LoginPageState extends State<LoginPage> {
       child: TextFormField(
         controller: controller,
         obscureText: obscureText,
-        validator:
-            (value) =>
-                value == null || value.isEmpty
-                    ? "$hint tidak boleh kosong"
-                    : null,
+        validator: (value) =>
+            value == null || value.isEmpty ? "$hint tidak boleh kosong" : null,
         decoration: InputDecoration(
           prefixIcon: const Icon(Icons.lock),
           hintText: hint,

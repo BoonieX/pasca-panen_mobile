@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
-import 'pages/splash_screen1.dart';
+import 'pages/splash/splash_screen1.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // if (!kIsWeb) {
-  //   print("Running on Mobile/Desktop, DB init di-skip (nggak pakai SQLite sekarang)");
-  // } else {
-  //   print("Running on Web: SQLite not supported, skipping DB init");
-  // }
-
   runApp(const MyApp());
 }
 

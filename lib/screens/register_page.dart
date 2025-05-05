@@ -37,7 +37,7 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
       try {
-        final isSuccess = await AuthService().register(registerRequest); // sesuai service kamu
+        final isSuccess = await AuthService().register(registerRequest); // sesuai service
 
         if (isSuccess) {
           _showMessage("Registrasi berhasil! Silakan login.");
@@ -46,7 +46,7 @@ class _RegisterPageState extends State<RegisterPage> {
             MaterialPageRoute(builder: (_) => const LoginPage()),
           );
         } else {
-          _showMessage("Registrasi gagal! Coba lagi.");
+          _showMessage("Username/Email Sudah Terdaftar");
         }
       } catch (e) {
         _showMessage("Terjadi kesalahan koneksi.");
@@ -81,7 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  "Langkah pertama dimulai di sini !",
+                  "Lengkapi Data Diri Anda !",
                   style: TextStyle(fontSize: 14, color: Colors.black54),
                 ),
                 const SizedBox(height: 30),

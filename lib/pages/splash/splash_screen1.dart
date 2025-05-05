@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'splash_screen.dart'; // Ganti sesuai nama file splash berikutnya
+import 'package:pascapanen_mobile/screens/login_page.dart';
 
 class SplashScreen1 extends StatefulWidget {
   const SplashScreen1({super.key});
@@ -24,7 +24,7 @@ class _SplashScreen1State extends State<SplashScreen1> {
     });
 
     // Fade out setelah 2 detik
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 3), () {
       setState(() {
         _opacity = 0.0;
       });
@@ -34,7 +34,7 @@ class _SplashScreen1State extends State<SplashScreen1> {
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const SplashScreen()),
+        MaterialPageRoute(builder: (context) => const LoginPage()),
       );
     });
   }
