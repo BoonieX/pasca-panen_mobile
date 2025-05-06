@@ -72,6 +72,9 @@ flutter:
     - assets/logo_splash1.png
     - assets/logo_splash2.jpg
     - assets/logo_splash3.jpg
+    - assets/berita1.jpg
+    - assets/berita2.jpg
+    - assets/berita3.jpg
 
 
   # To add assets to your application, add an assets section, like this:
