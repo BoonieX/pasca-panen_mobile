@@ -6,10 +6,11 @@ class DetailBeritaPage extends StatelessWidget {
   final String gambar;
 
   const DetailBeritaPage({
+    Key? key,
     required this.judul,
     required this.isi,
     required this.gambar,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,19 +23,30 @@ class DetailBeritaPage extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
+              child: Image.network(
                 gambar,
                 width: double.infinity,
                 height: 200,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  Icons.broken_image,
+                  size: 100,
+                ),
               ),
             ),
             const SizedBox(height: 16),
-            Text(judul,
-                style: const TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(
+              judul,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 12),
-            Text(isi, style: const TextStyle(fontSize: 16)),
+            Text(
+              isi,
+              style: const TextStyle(fontSize: 16),
+            ),
           ],
         ),
       ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pascapanen_mobile/pages/Main/home_screen.dart';
+import 'package:pascapanen_mobile/pages/main_screen.dart';
 import 'pages/splash/splash_screen1.dart';
 import 'pages/main_screen.dart';
 
