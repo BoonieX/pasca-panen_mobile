@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 class PurchaseFormPage extends StatefulWidget {
   final Map<String, String> produk;
 
-  PurchaseFormPage({required this.produk});
+  const PurchaseFormPage({super.key, required this.produk});
 
   @override
-  _PurchaseFormPageState createState() => _PurchaseFormPageState();
+  State<PurchaseFormPage> createState() => _PurchaseFormPageState();
 }
 
 class _PurchaseFormPageState extends State<PurchaseFormPage> {
@@ -15,9 +15,20 @@ class _PurchaseFormPageState extends State<PurchaseFormPage> {
   final _quantityController = TextEditingController();
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    _quantityController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Form Pembelian")),
+      appBar: AppBar(
+        title: const Text("Form Pembelian"),
+        backgroundColor: const Color(0xFF10B981),
+        foregroundColor: Colors.white,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -27,37 +38,46 @@ class _PurchaseFormPageState extends State<PurchaseFormPage> {
             children: [
               // Gambar produk
               Center(
-                child: Image.network(
-                  widget.produk['gambar']!,
-                  height: 150,
-                  fit: BoxFit.cover,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.asset(
+                    widget.produk['gambar']!,
+                    height: 160,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 "Produk: ${widget.produk['nama']}",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text("Harga: ${widget.produk['harga']}"),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
+
+              // Nama Pembeli
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Nama Pembeli",
+                  border: OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
+                  if (value == null || value.trim().isEmpty) {
                     return 'Nama tidak boleh kosong';
                   }
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
+
+              // Jumlah
               TextFormField(
                 controller: _quantityController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Jumlah (kg/paket)",
+                  border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -67,20 +87,27 @@ class _PurchaseFormPageState extends State<PurchaseFormPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
+
+              // Tombol Konfirmasi
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Pembelian diproses')),
+                        const SnackBar(content: Text('Pembelian diproses')),
                       );
                     }
                   },
-                  child: Text("Konfirmasi Pembelian"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF10B981),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: const Text("Konfirmasi Pembelian"),
                 ),
-              )
+              ),
             ],
           ),
         ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'pembelian.dart';
 
 class TokoScreen extends StatelessWidget {
+  const TokoScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -9,8 +11,8 @@ class TokoScreen extends StatelessWidget {
       title: 'Produk Toko',
       theme: ThemeData.light().copyWith(
         scaffoldBackgroundColor: const Color(0xFFD1FAE5),
-        colorScheme: ColorScheme.light(
-          primary: const Color(0xFF10B981),
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF10B981),
           onPrimary: Colors.white,
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
@@ -20,14 +22,16 @@ class TokoScreen extends StatelessWidget {
           ),
         ),
       ),
-      home: ProdukPage(),
+      home: const ProdukPage(),
     );
   }
 }
 
 class ProdukPage extends StatefulWidget {
+  const ProdukPage({super.key});
+
   @override
-  _ProdukPageState createState() => _ProdukPageState();
+  State<ProdukPage> createState() => _ProdukPageState();
 }
 
 class _ProdukPageState extends State<ProdukPage> {
@@ -46,28 +50,28 @@ class _ProdukPageState extends State<ProdukPage> {
       'stok': '100',
       'harga': 'Rp. 50.000',
       'kategori': 'Beras',
-      'gambar': 'https://via.placeholder.com/150',
+      'gambar': 'assets/beras1.jpg',
     },
     {
       'nama': 'Pupuk Organik',
       'stok': '50',
       'harga': 'Rp. 30.000',
       'kategori': 'Pupuk',
-      'gambar': 'https://via.placeholder.com/150',
+      'gambar': 'assets/pupuk.jpg',
     },
     {
       'nama': 'Obat Hama',
       'stok': '75',
       'harga': 'Rp. 40.000',
       'kategori': 'Obat',
-      'gambar': 'https://via.placeholder.com/150',
+      'gambar': 'assets/obat.jpg',
     },
     {
       'nama': 'Beras Premium',
       'stok': '120',
       'harga': 'Rp. 60.000',
       'kategori': 'Beras',
-      'gambar': 'https://via.placeholder.com/150',
+      'gambar': 'assets/beras2.jpg',
     },
   ];
 
@@ -88,41 +92,36 @@ class _ProdukPageState extends State<ProdukPage> {
       ),
       body: Column(
         children: [
-          // Kategori Scroll
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children:
-                    kategori.map((item) {
-                      final bool selected = item['label'] == kategoriAktif;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              kategoriAktif = item['label'];
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                selected
-                                    ? const Color(0xFF10B981)
-                                    : Colors.grey[300],
-                            foregroundColor:
-                                selected ? Colors.white : Colors.black,
-                          ),
-                          icon: Icon(item['icon']),
-                          label: Text(item['label']),
-                        ),
-                      );
-                    }).toList(),
+                children: kategori.map((item) {
+                  final bool selected = item['label'] == kategoriAktif;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          kategoriAktif = item['label'];
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: selected
+                            ? const Color(0xFF10B981)
+                            : Colors.grey[300],
+                        foregroundColor:
+                            selected ? Colors.white : Colors.black,
+                      ),
+                      icon: Icon(item['icon']),
+                      label: Text(item['label']),
+                    ),
+                  );
+                }).toList(),
               ),
             ),
           ),
-
-          // Produk Grid
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(10),
@@ -144,9 +143,14 @@ class _ProdukPageState extends State<ProdukPage> {
                   child: Column(
                     children: [
                       Expanded(
-                        child: Image.network(
-                          item['gambar']!,
-                          fit: BoxFit.cover,
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(10)),
+                          child: Image.asset(
+                            item['gambar']!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          ),
                         ),
                       ),
                       Padding(
