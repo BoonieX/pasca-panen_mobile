@@ -33,12 +33,20 @@ class _BeritaScreenState extends State<BeritaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF00D26A),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF00D26A),
-        elevation: 0,
-        title: const Text("Berita", style: TextStyle(color: Colors.white)),
-      ),
+  backgroundColor: const Color(0xFF00D26A),
+  elevation: 0,
+  centerTitle: true, // bikin judul di tengah
+  title: const Text(
+    "BERITA",
+    style: TextStyle(
+      color: Colors.white,
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      letterSpacing: 1,
+    ),
+  ),
+),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -70,7 +78,7 @@ class _BeritaScreenState extends State<BeritaScreen> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
-                      ),
+      ),
                       color: Colors.green.shade100,
                       margin: const EdgeInsets.symmetric(vertical: 8),
                       child: Padding(
