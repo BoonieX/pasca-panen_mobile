@@ -2,7 +2,7 @@ class Produk {
   final int id;
   final String namaProduk;
   final String kategori;
-  final int harga;
+   final double harga;
   final int stok;
   final String satuan;
   final String gambar;
@@ -23,34 +23,18 @@ class Produk {
 
   factory Produk.fromJson(Map<String, dynamic> json) {
     return Produk(
-      id: json['id'],
-      namaProduk: json['nama_produk'],
-      kategori: json['kategori'],
-      harga: json['harga'],
-      stok: json['stok'],
-      satuan: json['satuan'],
-      gambar: json['gambar'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      id: json['id'] ?? 0,
+      namaProduk: json['nama_produk'] ?? '',
+      kategori: json['kategori'] ?? '',
+       harga: double.tryParse(json['harga'].toString()) ?? 0.0,
+      stok: json['stok'] ?? 0,
+      satuan: json['satuan'] ?? '',
+      gambar: json['gambar'] ?? '',
+      createdAt: DateTime.parse(json['created_at'] ?? ''),
+      updatedAt: DateTime.parse(json['updated_at'] ?? ''),
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'nama_produk': namaProduk,
-      'kategori': kategori,
-      'harga': harga,
-      'stok': stok,
-      'satuan': satuan,
-      'gambar': gambar,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-    };
-  }
-
-  String get fullImageUrl {
-    // Ganti URL berikut dengan URL dari Laravel public storage yang sesuai
-    return 'https://yourdomain.com/storage/$gambar';
-  }
+  String get fullImageUrl =>
+      'https://192.168.103.201:8000/storage/gambar_produk/$gambar';
 }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pascapanen_mobile/model/produk.dart';
 
 class PurchaseFormPage extends StatefulWidget {
-  final Map<String, String> produk;
+  final Produk produk;
 
   const PurchaseFormPage({super.key, required this.produk});
 
@@ -23,6 +24,8 @@ class _PurchaseFormPageState extends State<PurchaseFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final produk = widget.produk;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Form Pembelian"),
@@ -36,27 +39,26 @@ class _PurchaseFormPageState extends State<PurchaseFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Gambar produk
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    widget.produk['gambar']!,
+                  child: Image.network(
+                    produk.fullImageUrl,
                     height: 160,
                     fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        const Icon(Icons.broken_image, size: 64),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
               Text(
-                "Produk: ${widget.produk['nama']}",
+                "Produk: ${produk.namaProduk}",
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              Text("Harga: ${widget.produk['harga']}"),
+              Text("Harga: Rp ${produk.harga}"),
               const SizedBox(height: 24),
-
-              // Nama Pembeli
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
@@ -71,8 +73,6 @@ class _PurchaseFormPageState extends State<PurchaseFormPage> {
                 },
               ),
               const SizedBox(height: 16),
-
-              // Jumlah
               TextFormField(
                 controller: _quantityController,
                 decoration: const InputDecoration(
@@ -88,8 +88,6 @@ class _PurchaseFormPageState extends State<PurchaseFormPage> {
                 },
               ),
               const SizedBox(height: 24),
-
-              // Tombol Konfirmasi
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
