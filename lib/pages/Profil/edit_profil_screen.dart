@@ -1,4 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -10,12 +13,81 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controller untuk tiap field
   final _namaController = TextEditingController();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _teleponController = TextEditingController();
   final _alamatController = TextEditingController();
+
+  String? token;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadToken().then((_) {
+      _loadProfile();
+    });
+  }
+
+  Future<void> _loadToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('token');
+  }
+
+  Future<void> _loadProfile() async {
+    final response = await http.get(
+      Uri.parse('http://192.168.43.182:8000/api/profile'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body)['data'];
+      setState(() {
+        _namaController.text = data['nama_lengkap'] ?? '';
+        _usernameController.text = data['username'] ?? '';
+        _emailController.text = data['email'] ?? '';
+        _teleponController.text = data['no_telp'] ?? '';
+        _alamatController.text = data['alamat'] ?? '';
+      });
+    } else {
+      print('Gagal memuat profil: ${response.body}');
+    }
+  }
+
+  Future<void> _simpanProfil() async {
+    if (_formKey.currentState!.validate()) {
+      final response = await http.put(
+        Uri.parse('http://localhost:8000/api/profile/update'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'nama_lengkap': _namaController.text,
+          'username': _usernameController.text,
+          'email': _emailController.text,
+          'no_telp': _teleponController.text,
+          'alamat': _alamatController.text,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profil berhasil diperbarui')),
+        );
+        Navigator.pop(context);
+      } else {
+        final error = json.decode(response.body)['message'];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal update: $error')),
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -25,16 +97,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _teleponController.dispose();
     _alamatController.dispose();
     super.dispose();
-  }
-
-  void _simpanProfil() {
-    if (_formKey.currentState!.validate()) {
-      // Simpan data di sini, bisa kirim ke backend atau Hive/SQLite
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profil berhasil diperbarui')),
-      );
-      Navigator.pop(context); // Kembali ke halaman sebelumnya
-    }
   }
 
   @override
