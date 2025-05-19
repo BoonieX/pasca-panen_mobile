@@ -22,7 +22,7 @@
     // ✅ Ubah dariJson supaya token bisa dikasih dari luar
     factory UserModel.fromJson(Map<String, dynamic> json, {String token = ''}) {
       return UserModel(
-        id: json['id_petani'] ?? 0,
+        id: json['id'] ?? 0,
         namaLengkap: json['nama_lengkap'] ?? '',
         username: json['username'] ?? '',
         gender: json['gender'] ?? '',
@@ -35,7 +35,7 @@
 
     Map<String, dynamic> toJson() {
       return {
-        'id_petani': id,
+        'id': id,
         'nama_lengkap': namaLengkap,
         'username': username,
         'gender': gender,

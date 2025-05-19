@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pascapanen_mobile/pages/Main/home_screen.dart';
-import 'package:pascapanen_mobile/pages/main_screen.dart';
 import 'pages/splash/splash_screen1.dart';
-import 'pages/main_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
-      home: const MainScreen(),
+      home: const SplashScreen1(),
     );
   }
 }
