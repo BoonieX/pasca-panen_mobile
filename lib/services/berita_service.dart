@@ -5,6 +5,9 @@ import 'package:pascapanen_mobile/model/berita_model.dart';
 class BeritaService {
   final String baseUrl = 'http://192.168.103.201:8000/api'; 
 
+
+
+
   Future<List<BeritaModel>> fetchBerita() async {
     final response = await http.get(Uri.parse('$baseUrl/berita'));
 
