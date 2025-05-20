@@ -1,18 +1,19 @@
 name: pascapanen_mobile
 description: "A new Flutter project."
 
-publish_to: 'none' 
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
   sdk: ^3.7.2
 
-
 dependencies:
   flutter:
     sdk: flutter
 
-  
+  image_picker: ^1.0.7
+  marquee: ^2.2.3
+  google_fonts: ^6.1.0
   cupertino_icons: ^1.0.8
   path_provider: ^2.0.15
   collection: ^1.17.1
@@ -27,13 +28,9 @@ dev_dependencies:
     sdk: flutter
   build_runner: ^2.4.6
 
- 
   flutter_lints: ^5.0.0
 
-
 flutter:
-
-  
   uses-material-design: true
 
   assets:
@@ -50,6 +47,4 @@ flutter:
     - assets/beras2.jpg
     - assets/pupuk.jpg
     - assets/obat.jpg
-
-
-  
+    - assets/background_pattern.png

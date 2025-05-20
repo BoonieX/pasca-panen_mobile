@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:pascapanen_mobile/model/produk.dart';
 
 class ProdukService {
-  final String baseUrl = 'http://192.168.43.182:8000/api';
+  static const String baseUrl = 'http://192.168.43.182:8000/api';
 
   Future<dynamic> fetchProdukList() async {
     final response = await http.get(Uri.parse('$baseUrl/produk'));
