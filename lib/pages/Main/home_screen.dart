@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pascapanen_mobile/model/berita_model.dart';
 import 'package:pascapanen_mobile/pages/Berita/DetailBeritaPage.dart';
 import 'package:pascapanen_mobile/services/berita_service.dart';
-
+import 'package:pascapanen_mobile/pages/detail_transaksi/detail.dart'; 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 

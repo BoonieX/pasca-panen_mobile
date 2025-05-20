@@ -7,7 +7,7 @@ import '../model/user_model.dart';
 
 class AuthService {
 
-  static const String baseUrl = "http://192.168.43.182:8000/api";
+  static const String baseUrl = "http://192.168.1.13:8000/api";
 
   // ✅ REGISTER
   Future<bool> register(RegisterRequest request) async {
