@@ -46,9 +46,11 @@ class _TokoScreenState extends State<TokoScreen> {
 
   List<Produk> get produkTersaring {
     if (kategoriAktif == 'Semua') return semuaProduk;
-    return semuaProduk
-        .where((produk) => produk.kategori == kategoriAktif)
-        .toList();
+
+    // Gunakan lowercase untuk pencocokan yang konsisten
+    return semuaProduk.where((produk) {
+      return produk.kategori.toLowerCase() == kategoriAktif.toLowerCase();
+    }).toList();
   }
 
   @override
@@ -61,6 +63,7 @@ class _TokoScreenState extends State<TokoScreen> {
       ),
       body: Column(
         children: [
+          // Tombol Kategori
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: SingleChildScrollView(
@@ -90,10 +93,10 @@ class _TokoScreenState extends State<TokoScreen> {
               ),
             ),
           ),
+
+          // Grid Produk
           if (isLoading)
-            const Expanded(
-              child: Center(child: CircularProgressIndicator()),
-            )
+            const Expanded(child: Center(child: CircularProgressIndicator()))
           else
             Expanded(
               child: produkTersaring.isEmpty
@@ -117,6 +120,7 @@ class _TokoScreenState extends State<TokoScreen> {
                           ),
                           child: Column(
                             children: [
+                              // Gambar Produk
                               Expanded(
                                 child: ClipRRect(
                                   borderRadius: const BorderRadius.vertical(
@@ -130,6 +134,8 @@ class _TokoScreenState extends State<TokoScreen> {
                                   ),
                                 ),
                               ),
+
+                              // Informasi Produk
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8.0,
@@ -144,7 +150,7 @@ class _TokoScreenState extends State<TokoScreen> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    Text('Stock : ${produk.stok}'),
+                                    Text('Stok : ${produk.stok}'),
                                     Text(
                                       'Harga : Rp ${produk.harga}',
                                       style: const TextStyle(
@@ -154,6 +160,8 @@ class _TokoScreenState extends State<TokoScreen> {
                                   ],
                                 ),
                               ),
+
+                              // Tombol Beli
                               SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton(
@@ -161,8 +169,7 @@ class _TokoScreenState extends State<TokoScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) =>
-                                            PurchaseFormPage(produk: produk),
+                                        builder: (_) => PurchaseFormPage(produk: produk),
                                       ),
                                     );
                                   },

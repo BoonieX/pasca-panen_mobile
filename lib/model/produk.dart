@@ -2,7 +2,7 @@ class Produk {
   final int id;
   final String namaProduk;
   final String kategori;
-   final double harga;
+  final double harga;
   final int stok;
   final String satuan;
   final String gambar;
@@ -23,18 +23,18 @@ class Produk {
 
   factory Produk.fromJson(Map<String, dynamic> json) {
     return Produk(
-      id: json['id'] ?? 0,
+      id: json['id_produk'] ?? json['id'] ?? 0,
       namaProduk: json['nama_produk'] ?? '',
-      kategori: json['kategori'] ?? '',
-       harga: double.tryParse(json['harga'].toString()) ?? 0.0,
+      kategori: (json['kategori'] ?? '').toString().toLowerCase(), // lowercase
+      harga: double.tryParse(json['harga'].toString()) ?? 0.0,
       stok: json['stok'] ?? 0,
       satuan: json['satuan'] ?? '',
       gambar: json['gambar'] ?? '',
-      createdAt: DateTime.parse(json['created_at'] ?? ''),
-      updatedAt: DateTime.parse(json['updated_at'] ?? ''),
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
     );
   }
 
   String get fullImageUrl =>
-      'https://192.168.103.201:8000/storage/gambar_produk/$gambar';
+      'http://192.168.2.206:8000/storage/${gambar.replaceAll("storage/", "")}';
 }

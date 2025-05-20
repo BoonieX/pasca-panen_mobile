@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pascapanen_mobile/pages/detail_transaksi/detail.dart';
 import 'Main/home_screen.dart';
 import 'Berita/berita_screen.dart';
 import 'toko/toko_screen.dart';
@@ -20,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
     const HomeScreen(),
     const TokoScreen(),
     const BeritaScreen(),
-    const HistoryScreen(),
+    const DetailScreen(),
     const ProfileScreen(),
   ];
 

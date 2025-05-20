@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pascapanen_mobile/model/berita_model.dart';
 import 'package:pascapanen_mobile/pages/Berita/DetailBeritaPage.dart';
 import 'package:pascapanen_mobile/services/berita_service.dart';
+import 'package:pascapanen_mobile/pages/detail_transaksi/detail.dart'; // ✅ Import halaman detail transaksi
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -96,7 +97,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const Divider(height: 24),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const DetailScreen(), // ✅ Navigasi ke DetailScreen
+                                ),
+                              );
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF10B981),
                               shape: RoundedRectangleBorder(
@@ -128,6 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     const SizedBox(height: 24),
+                    
 
                     // Berita
                     const Text("Berita",
