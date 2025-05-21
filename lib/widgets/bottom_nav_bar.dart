@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class BottomNavbar extends StatelessWidget {
@@ -12,98 +11,136 @@ class BottomNavbar extends StatelessWidget {
   }) : super(key: key);
 
   final List<_NavItem> _items = const [
-    _NavItem(icon: Icons.home, label: 'Home'),
-    _NavItem(icon: Icons.store, label: 'Toko'),
-    _NavItem(icon: Icons.article, label: 'Berita'),
-    _NavItem(icon: Icons.history, label: 'History'),
-    _NavItem(icon: Icons.person, label: 'Profile'),
-  ];
+  _NavItem(icon: Icons.home, label: 'Home'),       // index 0
+  _NavItem(icon: Icons.article, label: 'Berita'),  // index 1
+  _NavItem(icon: Icons.store, label: 'Toko'),      // index 2
+  _NavItem(icon: Icons.history, label: 'History'), // index 3
+  _NavItem(icon: Icons.person, label: 'Profile'),  // index 4
+];
+
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, -2),
-              ),
-            ],
-            border: Border.all(color: Colors.white.withOpacity(0.2)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children:
-                _items.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final item = entry.value;
-                  final isSelected = index == currentIndex;
+    final Size size = MediaQuery.of(context).size;
+    final double itemWidth = size.width / _items.length;
 
-                  return Expanded(
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () => onTap(index),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 8,
-                        ),
-                        decoration:
-                            isSelected
-                                ? BoxDecoration(
-                                  color: Colors.white.withOpacity(0.3),
-                                  borderRadius: BorderRadius.circular(16),
-                                )
-                                : null,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            AnimatedScale(
-                              scale: isSelected ? 1.2 : 1.0,
-                              duration: const Duration(milliseconds: 300),
-                              child: Icon(
-                                item.icon,
-                                color:
-                                    isSelected
-                                        ? Color(0xFF10B981)
-                                        : Colors.grey,
-                              ),
+    return Stack(
+      children: [
+        // Background dengan lekukan
+        CustomPaint(
+          size: Size(size.width, 80),
+          painter: ConvexPainter(selectedIndex: currentIndex, itemWidth: itemWidth),
+        ),
+        // Tombol-tombol
+        SizedBox(
+          height: 80,
+          child: Row(
+            children: _items.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+              final isSelected = index == currentIndex;
+
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () => onTap(index),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    padding: EdgeInsets.only(top: isSelected ? 8 : 4),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AnimatedScale(
+                          scale: isSelected ? 1.1 : 1.0,
+                          duration: const Duration(milliseconds: 300),
+                          child: Container(
+                            height: index == 2 ? 50 : 36,
+                            width: index == 2 ? 50 : 36,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: index == 2
+                                  ? (isSelected
+                                      ? Colors.orange
+                                      : Colors.orangeAccent.shade100)
+                                  : Colors.transparent,
+                              gradient: index == 2
+                                  ? const LinearGradient(
+                                      colors: [Color(0xFFFF7E5F), Color(0xFFFFB88C)],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    )
+                                  : null,
+                              boxShadow: isSelected
+                                  ? [
+                                      const BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 6,
+                                        offset: Offset(0, 4),
+                                      )
+                                    ]
+                                  : [],
                             ),
-                            const SizedBox(height: 4),
-                            AnimatedDefaultTextStyle(
-                              duration: const Duration(milliseconds: 300),
-                              style: TextStyle(
-                                color:
-                                    isSelected ? Colors.black : Colors.black54,
-                                fontWeight:
-                                    isSelected
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                fontSize: 12,
-                              ),
-                              child: Text(item.label),
+                            child: Icon(
+                              item.icon,
+                              color: index == 2 ? Colors.white : (isSelected ? Colors.orange : Colors.grey),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 4),
+                        Text(
+                          item.label,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isSelected ? Colors.black : Colors.black54,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                      ],
                     ),
-                  );
-                }).toList(),
+                  ),
+                ),
+              );
+            }).toList(),
           ),
         ),
-      ),
+      ],
     );
   }
 }
+
+class ConvexPainter extends CustomPainter {
+  final int selectedIndex;
+  final double itemWidth;
+
+  ConvexPainter({required this.selectedIndex, required this.itemWidth});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill
+      ..isAntiAlias = true;
+
+    final Path path = Path();
+    final double centerX = selectedIndex * itemWidth + itemWidth / 2;
+
+    path.moveTo(0, 0);
+    path.lineTo(centerX - 40, 0);
+    path.quadraticBezierTo(centerX - 35, 0, centerX - 35, 20);
+    path.quadraticBezierTo(centerX, 60, centerX + 35, 20);
+    path.quadraticBezierTo(centerX + 35, 0, centerX + 40, 0);
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+
+    canvas.drawShadow(path, Colors.black.withOpacity(0.1), 4, true);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
+}
+
 
 class _NavItem {
   final IconData icon;
@@ -111,3 +148,5 @@ class _NavItem {
 
   const _NavItem({required this.icon, required this.label});
 }
+
+
