@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../model/produk.dart';
 
 class ProdukService {
-  final String baseUrl = 'http://192.168.2.206:8000/api';
+  static const String baseUrl = 'http://192.168.1.13:8000/api';
 
   Future<List<Produk>> fetchProdukList() async {
     final response = await http.get(Uri.parse('$baseUrl/produk'));
