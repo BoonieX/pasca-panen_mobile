@@ -43,6 +43,6 @@ class Profile {
 
   @override
   String toString() {
-    return 'Profile(namaLengkap: $namaLengkap, username: $username, email: $email, gender: $gender, noTelp: $noTelp, alamat: $alamat, logo: $logo)';
+    return 'Profile(namaLengkap: $namaLengkap, username: $username, email: $email, gender: $gender, no_telp: $noTelp, alamat: $alamat, logo: $logo)';
   }
 }
