@@ -19,13 +19,14 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _pages = [
     const HomeScreen(),
-    const TokoScreen(),
     const BeritaScreen(),
+    const TokoScreen(),
     const DetailScreen(),
     const ProfileScreen(),
   ];
 
-  void _onItemTapped(int index) {
+  void _onItemTapped(int index) 
+  {
     setState(() => _selectedIndex = index);
   }
 
@@ -40,9 +41,7 @@ class _MainScreenState extends State<MainScreen> {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: SafeArea(
-          child: _pages[_selectedIndex],
-        ),
+        child: SafeArea(child: _pages[_selectedIndex]),
       ),
       bottomNavigationBar: BottomNavbar(
         currentIndex: _selectedIndex,
