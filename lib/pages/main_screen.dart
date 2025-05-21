@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'Main/home_screen.dart';
 import 'Berita/berita_screen.dart';
 import 'toko/toko_screen.dart';
-import 'Histori/history_screen.dart';
+import 'detail_transaksi/detail.dart';
 import 'Profil/profile_screen.dart';
 import '../widgets/bottom_nav_bar.dart';
 
@@ -25,8 +25,7 @@ class _MainScreenState extends State<MainScreen> {
     const ProfileScreen(),
   ];
 
-  void _onItemTapped(int index) 
-  {
+  void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
   }
 
