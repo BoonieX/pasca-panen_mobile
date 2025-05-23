@@ -11,6 +11,14 @@ dependencies:
   flutter:
     sdk: flutter
 
+  intl: ^0.18.1
+  google_maps_flutter: ^2.5.0
+  location: ^5.0.3
+  permission_handler: ^11.3.0
+  url_launcher: ^6.2.5
+  geolocator: ^11.0.0
+  geocoding: ^2.1.0
+  dio: ^5.4.0
   image_picker: ^1.0.7
   marquee: ^2.2.3
   google_fonts: ^6.1.0
@@ -31,8 +39,21 @@ dev_dependencies:
   flutter_lints: ^5.0.0
 
 flutter:
-  uses-material-design: true
 
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-Light.ttf
+          weight: 300
+
+  uses-material-design: true
   assets:
     - assets/logoapk.png
     - assets/logogoogle.webp

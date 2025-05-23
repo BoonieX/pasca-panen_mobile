@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pascapanen_mobile/screens/login_page.dart';
+import 'package:pascapanen_mobile/pages/splash/splash_screen.dart';
+
 
 class SplashScreen1 extends StatefulWidget {
   const SplashScreen1({super.key});
@@ -34,7 +36,7 @@ class _SplashScreen1State extends State<SplashScreen1> {
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
+        MaterialPageRoute(builder: (context) => const SplashScreen()),
       );
     });
   }

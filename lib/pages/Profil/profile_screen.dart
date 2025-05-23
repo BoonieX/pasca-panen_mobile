@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:pascapanen_mobile/pages/Profil/edit_profil_screen.dart';
-import 'package:pascapanen_mobile/screens/login_page.dart';
-import 'package:pascapanen_mobile/services/profile_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pascapanen_mobile/screens/login_page.dart';
+import 'package:pascapanen_mobile/pages/Profil/edit_profil_screen.dart';
+import 'package:pascapanen_mobile/services/profile_service.dart';
+import 'package:pascapanen_mobile/model/profile_model.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:pascapanen_mobile/services/logo_profile.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -13,57 +17,92 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  Map<String, dynamic>? profileData;
-  bool isLoading = true;
+  Profile? _profile;
+  bool _isLoading = true;
+
+  File? _imageFile; // file gambar sementara
+
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    fetchProfile();
+    _loadProfile();
   }
 
-  Future<void> fetchProfile() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    final response = await ProfileService.get('/profil', token: token);
-
-    if (response['success'] == true || response['nama_lengkap'] != null) {
+  Future<void> _loadProfile() async {
+    try {
+      final profile = await ProfileService.fetchProfile();
       setState(() {
-        profileData = response;
-        isLoading = false;
+        _profile = profile;
+        _isLoading = false;
       });
-    } else {
-      // Handle error or logout
-      if (context.mounted) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => const LoginPage()));
+    } catch (e) {
+      print('Gagal memuat profil: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+
+      // Ambil token dari shared preferences (sesuaikan)
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      // Upload ke server
+      final success = await LogoProfile.uploadProfileImage(
+        _imageFile!,
+        token,
+      );
+
+      if (success) {
+        print('Upload gambar berhasil');
+        // Refresh profil setelah upload
+        await _loadProfile();
+      } else {
+        print('Upload gambar gagal');
+        // Bisa tampilkan pesan error di UI
       }
     }
   }
 
-  void _logout() async {
+  void _logout(BuildContext context) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Konfirmasi Logout"),
-        content: const Text("Apakah Anda yakin ingin logout?"),
-        actions: [
-          TextButton(
-              child: const Text("Batal"),
-              onPressed: () => Navigator.of(context).pop(false)),
-          TextButton(
-            child: const Text("Logout", style: TextStyle(color: Colors.red)),
-            onPressed: () => Navigator.of(context).pop(true),
+      builder:
+          (context) => AlertDialog(
+            title: Text("Konfirmasi Logout", style: GoogleFonts.poppins()),
+            content: Text(
+              "Apakah Anda yakin ingin logout?",
+              style: GoogleFonts.poppins(),
+            ),
+            actions: [
+              TextButton(
+                child: Text("Batal", style: GoogleFonts.poppins()),
+                onPressed: () => Navigator.of(context).pop(false),
+              ),
+              TextButton(
+                child: Text(
+                  "Logout",
+                  style: GoogleFonts.poppins(color: Colors.red),
+                ),
+                onPressed: () => Navigator.of(context).pop(true),
+              ),
+            ],
           ),
-        ],
-      ),
     );
 
     if (confirm == true) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('token');
-
       if (context.mounted) {
         Navigator.pushAndRemoveUntil(
           context,
@@ -74,139 +113,216 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF00D26A), Color(0xFFE8FFE9)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: Text("Profil",
-              style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20)),
-          centerTitle: true,
-        ),
-        body: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    const CircleAvatar(
-                      radius: 50,
-                      backgroundImage: AssetImage('assets/logoapk.png'),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(profileData?['nama_lengkap'] ?? '',
-                        style: GoogleFonts.poppins(
-                            fontSize: 20, fontWeight: FontWeight.w600)),
-                    Text(profileData?['email'] ?? '',
-                        style: GoogleFonts.poppins(
-                            fontSize: 14, color: Colors.grey.shade700)),
-                    const SizedBox(height: 24),
-                    _buildProfileCard(),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const EditProfileScreen()),
-                      ),
-                      icon: const Icon(Icons.edit),
-                      label: const Text("Edit Profil"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF059669),
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size.fromHeight(48),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    OutlinedButton.icon(
-                      onPressed: _logout,
-                      icon: const Icon(Icons.logout),
-                      label: const Text("Logout"),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.red,
-                        side: const BorderSide(color: Colors.red),
-                        minimumSize: const Size.fromHeight(48),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                  ],
+  Widget _profileItem(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: Colors.black54),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-      ),
-    );
-  }
-
-  Widget _buildProfileCard() {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFD1FAE5),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 6,
-            offset: const Offset(0, 4),
+                Text(label, style: GoogleFonts.poppins(color: Colors.grey)),
+              ],
+            ),
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-      child: Column(
-        children: [
-          _ProfileItem(label: "Nama Lengkap", value: profileData?['nama_lengkap']),
-          const Divider(),
-          _ProfileItem(label: "Username", value: profileData?['username']),
-          const Divider(),
-          _ProfileItem(label: "Email", value: profileData?['email']),
-          const Divider(),
-          _ProfileItem(label: "Gender", value: profileData?['gender']),
-          const Divider(),
-          _ProfileItem(label: "No Telp", value: profileData?['no_telp']),
-          const Divider(),
-          _ProfileItem(label: "Alamat", value: profileData?['alamat']),
-        ],
-      ),
     );
   }
-}
-
-class _ProfileItem extends StatelessWidget {
-  final String? label;
-  final String? value;
-
-  const _ProfileItem({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(label ?? '',
-              style: GoogleFonts.poppins(
-                  color: Colors.grey[700], fontWeight: FontWeight.w500)),
-        ),
-        const SizedBox(width: 16),
-        Flexible(
-          child: Text(value ?? '',
-              textAlign: TextAlign.right,
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-        ),
-      ],
+    return Scaffold(
+      backgroundColor: const Color(0xFF166534),
+      body: SafeArea(
+        child:
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _profile == null
+                ? Center(
+                  child: Text(
+                    "Gagal memuat data",
+                    style: GoogleFonts.poppins(color: Colors.white),
+                  ),
+                )
+                : SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 5),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.white),
+                              onPressed: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const EditProfilePage(),
+                                  ),
+                                );
+
+                                if (result == true) {
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
+                                  await _loadProfile();
+                                }
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.settings,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {},
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.logout,
+                                color: Colors.white,
+                              ),
+                              onPressed: () => _logout(context),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Colors.white,
+                            backgroundImage:
+                                _imageFile != null
+                                    ? FileImage(_imageFile!)
+                                    : (_profile != null &&
+                                                _profile!.loogo.isNotEmpty
+                                            ? NetworkImage(_profile!.loogo)
+                                            : null)
+                                        as ImageProvider<Object>?,
+                            child:
+                                (_profile == null ||
+                                        (_profile!.loogo.isEmpty &&
+                                            _imageFile == null))
+                                    ? const Icon(
+                                      Icons.person,
+                                      size: 40,
+                                      color: Colors.grey,
+                                    )
+                                    : null,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: GestureDetector(
+                              onTap: () async {
+                                await _pickImage();
+                                // Jika mau reload data dari server setelah upload,
+                                // panggil _loadProfile();
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.green[700],
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
+                                ),
+                                padding: const EdgeInsets.all(6),
+                                child: const Icon(
+                                  Icons.camera_alt,
+                                  size: 20,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        _profile!.namaLengkap,
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        _profile!.noTelp,
+                        style: GoogleFonts.poppins(color: Colors.white70),
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(20),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _profileItem(
+                              Icons.person,
+                              'Nama Lengkap',
+                              _profile!.namaLengkap,
+                            ),
+                            _profileItem(
+                              Icons.account_circle,
+                              'Username',
+                              _profile!.username,
+                            ),
+                            _profileItem(Icons.email, 'Email', _profile!.email),
+                            _profileItem(
+                              Icons.phone,
+                              'Nomor HP',
+                              _profile!.noTelp,
+                            ),
+                            _profileItem(
+                              Icons.male,
+                              'Jenis Kelamin',
+                              _profile!.gender,
+                            ),
+                            _profileItem(
+                              Icons.location_on,
+                              'Alamat',
+                              _profile!.alamat,
+                            ),
+                            _profileItem(
+                              Icons.store,
+                              'Jenis Akun',
+                              _profile!.role,
+                            ),
+                            _profileItem(
+                              Icons.date_range,
+                              'Bergabung Sejak',
+                              _profile!.createdAt,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+      ),
     );
   }
 }

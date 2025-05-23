@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pascapanen_mobile/model/berita_model.dart';
-import 'package:pascapanen_mobile/pages/Berita/DetailBeritaPage.dart';
+import 'package:pascapanen_mobile/pages/Berita/Detail_Berita_Screen.dart';
 import 'package:pascapanen_mobile/services/berita_service.dart';
 
 class BeritaScreen extends StatefulWidget {
@@ -21,7 +21,7 @@ class _BeritaScreenState extends State<BeritaScreen> {
   }
 
   Future<void> fetchBerita() async {
-    final api = BeritaService(); 
+    final api = BeritaService();
     final data = await api.fetchBerita();
 
     setState(() {
@@ -34,104 +34,116 @@ class _BeritaScreenState extends State<BeritaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-  backgroundColor: const Color(0xFF00D26A),
-  elevation: 0,
-  centerTitle: true, // bikin judul di tengah
-  title: const Text(
-    "BERITA",
-    style: TextStyle(
-      color: Colors.white,
-      fontSize: 20,
-      fontWeight: FontWeight.bold,
-      letterSpacing: 1,
-    ),
-  ),
-),
+        backgroundColor: const Color(0xFF166534), // Hijau elegan
+        elevation: 2,
+        centerTitle: true,
+        title: const Text(
+          "BERITA",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF00D26A), Color(0xFFE8FFE9)],
+            colors: [Color(0xFFDFFFE0), Color(0xFFF5FFF6)], // Hijau putih cerah
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : ListView.builder(
-                padding: const EdgeInsets.all(12),
-                itemCount: beritaList.length,
-                itemBuilder: (context, index) {
-                  final berita = beritaList[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => DetailBeritaPage(
-                            judul: berita.judul,
-                            isi: berita.isi,
-                            gambar: berita.gambar,
+        child:
+            isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: beritaList.length,
+                  itemBuilder: (context, index) {
+                    final berita = beritaList[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (_) => DetailBeritaPage(
+                                  judul: berita.judul,
+                                  isi: berita.isi,
+                                  gambar: berita.fullIUrl,
+                                ),
+                          ),
+                        );
+                      },
+                      child: Card(
+                        elevation: 4,
+                        shadowColor: Colors.black12,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        child: Container(
+                          padding: const EdgeInsets.all(14),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  berita.fullIUrl,
+                                  width: 70,
+                                  height: 70,
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (context, error, stackTrace) =>
+                                          const Icon(
+                                            Icons.broken_image,
+                                            size: 64,
+                                          ),
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      berita.judul,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Color(0xFF166534),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      berita.isi,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    const Text(
+                                      "Baca Selengkapnya",
+                                      style: TextStyle(
+                                        color: Color(0xFF16A34A),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      );
-                    },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-      ),
-                      color: Colors.green.shade100,
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                berita.gambar,
-                                width: 64,
-                                height: 64,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const Icon(Icons.broken_image, size: 64),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    berita.judul,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    berita.isi,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  const Text(
-                                    "Baca Selengkapnya",
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                ),
       ),
     );
   }

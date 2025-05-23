@@ -2,30 +2,36 @@ class Profile {
   final String namaLengkap;
   final String username;
   final String email;
-  final String gender;
   final String noTelp;
+  final String gender;
   final String alamat;
-  final String? logo;
+  final String role;
+  final String createdAt;
+  final String? logo;  // nullable, bisa null
 
   Profile({
     required this.namaLengkap,
     required this.username,
     required this.email,
-    required this.gender,
     required this.noTelp,
+    required this.gender,
     required this.alamat,
-    this.logo,
+    required this.role,
+    required this.createdAt,
+    this.logo,  // tidak required supaya bisa null
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     return Profile(
-      namaLengkap: json['nama_lengkap'] as String,
-      username: json['username'] as String,
-      email: json['email'] as String,
-      gender: json['gender'] as String,
-      noTelp: json['no_telp'] as String,
-      alamat: json['alamat'] as String,
-      logo: json['logo'] != null ? json['logo'] as String : null,
+      namaLengkap: json['nama_lengkap'] ?? '',
+      username: json['username'] ?? '',
+      email: json['email'] ?? '',
+      noTelp: json['no_telp'] ?? '',
+      gender: json['gender'] ?? '',
+      alamat: json['alamat'] ?? '',
+      role: json['role'] ?? '',
+      createdAt: (json['created_at'] ?? '').toString().substring(0, 10),
+      logo: json['logo'] as String?,  // bisa null
     );
   }
 
@@ -34,15 +40,21 @@ class Profile {
       'nama_lengkap': namaLengkap,
       'username': username,
       'email': email,
-      'gender': gender,
       'no_telp': noTelp,
+      'gender': gender,
       'alamat': alamat,
+      'role': role,
+      'created_at': createdAt,
       'logo': logo,
     };
   }
 
-  @override
-  String toString() {
-    return 'Profile(namaLengkap: $namaLengkap, username: $username, email: $email, gender: $gender, no_telp: $noTelp, alamat: $alamat, logo: $logo)';
+  String get loogo {
+    if (logo == null || logo!.isEmpty) return '';
+    // bersihkan 'storage/' kalau ada
+    String cleanPath = logo!.replaceAll('storage/', '');
+    // base URL backend kamu (ganti sesuai IP/domain)
+    const baseUrl = 'http://192.168.43.182:8000/storage/';
+    return baseUrl + cleanPath;
   }
 }

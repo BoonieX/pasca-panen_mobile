@@ -32,29 +32,15 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       extendBody: true,
       body: Stack(
         children: [
-          // Background dengan gradient + image
+          // Background warna solid hijau tua (bukan gradien)
           Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF2ecc71), Color(0xFFF0FDF4)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
+            color: const Color(0xFF166534), // warna solid
           ),
-          // Tambahkan gambar background semi-transparan
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.06,
-              child: Image.asset(
-                'assets/background_pattern.png', // ganti sesuai gambar kamu
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
+
           // Blur lembut
           Positioned.fill(
             child: BackdropFilter(
@@ -62,7 +48,8 @@ class _MainScreenState extends State<MainScreen> {
               child: const SizedBox(),
             ),
           ),
-          // Konten halaman dengan transisi
+
+          // Konten halaman
           SafeArea(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),

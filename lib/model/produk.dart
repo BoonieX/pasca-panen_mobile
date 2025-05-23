@@ -36,5 +36,5 @@ class Produk {
   }
 
   String get fullImageUrl =>
-      'http://192.168.1.20:8000/storage/${gambar.replaceAll("storage/", "")}';
+      'http://192.168.43.182:8000/storage/${gambar.replaceAll("storage/", "")}';
 }

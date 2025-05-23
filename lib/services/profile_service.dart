@@ -1,16 +1,32 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pascapanen_mobile/model/profile_model.dart';
 
 class ProfileService {
-  static const String _baseUrl = 'http://192.168.1.20:8000/api'; // ganti dengan IP server
+  static const _baseUrl =
+      'http://192.168.43.182:8000/api'; // Ganti dengan base URL Laravel-mu
+  static final Dio _dio = Dio(BaseOptions(baseUrl: _baseUrl));
 
-  static Future<Map<String, dynamic>> get(String path, {String? token}) async {
-    final url = Uri.parse("$_baseUrl$path");
-    final response = await http.get(url, headers: {
-      'Accept': 'application/json',
-      if (token != null) 'Authorization': 'Bearer $token',
-    });
+  /// Attach Bearer Token dari SharedPreferences ke header Dio
+  static Future<void> _attachToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token != null) {
+      _dio.options.headers['Authorization'] = 'Bearer $token';
+      _dio.options.headers['Accept'] = 'application/json';
+    }
+  }
 
-    return json.decode(response.body);
+  /// Ambil data profil dari API
+  static Future<Profile> fetchProfile() async {
+    await _attachToken();
+    final response = await _dio.get('/profile');
+    return Profile.fromJson(response.data['data']);
+  }
+
+  /// Update profil melalui API
+  static Future<void> updateProfile(Profile profile) async {
+    await _attachToken();
+    await _dio.post('/profile/update', data: profile.toJson());
   }
 }

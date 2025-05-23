@@ -28,4 +28,7 @@ class BeritaModel {
       'gambar': gambar,
     };
   }
+
+  String get fullIUrl =>
+      'http://192.168.43.182:8000/storage/${gambar.replaceAll("storage/", "")}';
 }

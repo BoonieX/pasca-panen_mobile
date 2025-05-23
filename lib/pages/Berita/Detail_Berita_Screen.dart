@@ -40,10 +40,9 @@ class DetailBeritaPage extends StatelessWidget {
                 gambar,
                 height: 200,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => const Icon(
-                  Icons.broken_image,
-                  size: 100,
-                ),
+                errorBuilder:
+                    (context, error, stackTrace) =>
+                        const Icon(Icons.broken_image, size: 100),
               ),
             ),
             const SizedBox(height: 16),
@@ -72,10 +71,7 @@ class DetailBeritaPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Text(
-                    isi,
-                    style: const TextStyle(fontSize: 16, height: 1.5),
-                  ),
+                  Text(isi, style: const TextStyle(fontSize: 16, height: 1.5)),
                 ],
               ),
             ),

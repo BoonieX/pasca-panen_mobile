@@ -27,6 +27,17 @@ class DbHelper {
     );
   }
 
+  Future<UserModel> getLoggedInUser() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('user', limit: 1);
+
+    if (maps.isNotEmpty) {
+      return UserModel.fromMap(maps.first);
+    } else {
+      throw Exception("User belum login");
+    }
+  }
+
   // Menyimpan user ke database
   Future<void> insertUser(UserModel user) async {
     final db = await database;
