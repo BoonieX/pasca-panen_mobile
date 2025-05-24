@@ -136,12 +136,13 @@ class AuthService {
         final now = DateTime.now();
         final difference = now.difference(lastLogin);
 
-        // Jika sudah lebih dari 5 hari
-        if (difference.inDays <= 1) {
-          return true; // Token masih aktif dan belum lebih dari 5 hari
+        print("Selisih waktu login terakhir: ${difference.inSeconds} detik");
+
+        if (difference.inSeconds <= 120) {
+          return true; // Login masih valid dalam 2 menit
         } else {
-          print("Token kadaluwarsa, auto logout setelah 1 hari.");
-          await logout(); // Token expired setelah 1 hari
+          print("Token kadaluwarsa, logout otomatis setelah 2 menit.");
+          await logout(); // Auto logout
           return false;
         }
       }

@@ -39,16 +39,20 @@ class _LoginPageState extends State<LoginPage> {
         final now = DateTime.now();
         final difference = now.difference(lastLogin);
 
-        if (difference.inDays <= 1) {
-          // Langsung redirect ke MainScreen
+        print("Durasi login: ${difference.inSeconds} detik");
+
+        if (difference.inSeconds <= 120) {
+          if (!mounted) return;
+          _showMessage("Login berhasil!");
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => MainScreen()),
           );
+          return;
         } else {
-          // Token expired, hapus data
           await prefs.remove('token');
           await prefs.remove('last_login');
+          print("Token expired (lebih dari 2 menit), auto logout.");
         }
       }
     }
@@ -75,18 +79,15 @@ class _LoginPageState extends State<LoginPage> {
             alamat: user.alamat,
             token: user.token,
           );
+          if (!mounted) return;
           await dbHelper.insertUser(userModel);
-
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('token', user.token ?? '');
-          await prefs.setString('last_login', DateTime.now().toIso8601String());
-
           _showMessage("Login berhasil!");
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => MainScreen()),
           );
         } else {
+          if (!mounted) return;
           _showMessage("Login gagal. Cek username atau password.");
         }
       } catch (e) {
@@ -96,7 +97,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -142,7 +145,9 @@ class _LoginPageState extends State<LoginPage> {
                   hint: "Password",
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  toggle: () => setState(() => _obscurePassword = !_obscurePassword),
+                  toggle:
+                      () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -151,7 +156,8 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         Checkbox(
                           value: _rememberMe,
-                          onChanged: (value) => setState(() => _rememberMe = value!),
+                          onChanged:
+                              (value) => setState(() => _rememberMe = value!),
                           activeColor: Colors.green,
                         ),
                         const Text("Ingat Saya"),
@@ -161,7 +167,9 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const ForgotPasswordPage()),
+                          MaterialPageRoute(
+                            builder: (_) => const ForgotPasswordPage(),
+                          ),
                         );
                       },
                       child: const Text(
@@ -195,10 +203,13 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     const Text("Belum Punya Akun? "),
                     GestureDetector(
-                      onTap: () => Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => const RegisterPage()),
-                      ),
+                      onTap:
+                          () => Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const RegisterPage(),
+                            ),
+                          ),
                       child: const Text(
                         "Daftar",
                         style: TextStyle(
@@ -228,8 +239,11 @@ class _LoginPageState extends State<LoginPage> {
       child: TextFormField(
         controller: controller,
         keyboardType: type,
-        validator: (value) =>
-            value == null || value.isEmpty ? "$hint tidak boleh kosong" : null,
+        validator:
+            (value) =>
+                value == null || value.isEmpty
+                    ? "$hint tidak boleh kosong"
+                    : null,
         decoration: InputDecoration(
           prefixIcon: Icon(icon),
           hintText: hint,
@@ -255,8 +269,11 @@ class _LoginPageState extends State<LoginPage> {
       child: TextFormField(
         controller: controller,
         obscureText: obscureText,
-        validator: (value) =>
-            value == null || value.isEmpty ? "$hint tidak boleh kosong" : null,
+        validator:
+            (value) =>
+                value == null || value.isEmpty
+                    ? "$hint tidak boleh kosong"
+                    : null,
         decoration: InputDecoration(
           prefixIcon: const Icon(Icons.lock),
           hintText: hint,
